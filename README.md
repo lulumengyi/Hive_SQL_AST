@@ -119,5 +119,43 @@ group by a1.dim_day_txdate,a.a_pin
 ```
 
 所以从上面的sql中，进行我们的解析可以得到dim_day_txdate字段来源于dmv.dim_day，a_pin来源于dwd.dwd_as_qy_cust_account_s_d，total_amount是
-来源于DWD.dwd_actv_as_qy_iou_receipt_s_d中的(order_amt)经过sum之后得到amount 再通过sum和coleace操作得到的，这系列的血缘关系变化我们将用链表方式进行存储
-，得到最终的血缘关系。
+来源于DWD.dwd_actv_as_qy_iou_receipt_s_d中的(order_amt)经过sum之后得到amount 再通过sum和coleace操作得到的，这系列的血缘关系变化我们将用链表方式进行存储，得到最终的血缘关系。
+
+## 代码结构如下：
+```
+dw-column-level-lineage/                                                         # 工程根目录
+├── src/                           
+|   ├─ main                    
+|   |  ├─ lineage
+|   |  |     ├─ analysis
+|   |  |     |      ├─ ColumnLineageAnalyzer.java                                 #解析主函数
+|   |  |     ├─ domains
+|   |  |     |      ├─ basic                                                      #数据结构的基本定义
+|   |  |     |      |    ├─ Column.java
+|   |  |     |      |    ├─ ColumnType.java
+|   |  |     |      |    ├─ Database.java
+|   |  |     |      |    ├─ DatabaseType.java
+|   |  |     |      |    ├─ Table.java
+|   |  |     |      |    ├─ TableType.java
+|   |  |     |      |    ├─ ForeignKeys.java
+|   |  |     |      ├─ lineage                                                    # 血缘关系链表的定义
+|   |  |     |      |    ├─ table
+|   |  |     |      |    |     ├─ TableColumnLineage.java
+|   |  |     |      |    ├─ column
+|   |  |     |      |    |     ├─ ColumnLineageColumnNode.java
+|   |  |     |      |    |     ├─ ColumnLineageColumnNodeType.java
+|   |  |     |      |    |     ├─ ColumnLineageRelationNodeType.java
+|   |  |     |      |    |     ├─ ColumnLineageRelationNode.java
+|   |  |     |      |    |     ├─ ColumnLineageUtils.java
+|   |  |     ├─ utils                                                            # 数据处理文件
+|   |  |     |      ├─ ProcessUnparsedSQL.java
+|   |  |     |      ├─ SchemaExtractor.java
+|   |  |     |      ├─ SchemaLoader.java
+|   |  |     |      ├─ SQLExtractor.java
+|   |  ├─ resource    
+|   |  |     ├─ log4j2.xml
+|   ├─ test                                                                      # 单元测试文件
+├── .gitignore                                                                   # Git Ignore 文件
+├── pox.ml                                                                       # maven配置文件
+            
+```
